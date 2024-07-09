@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import Container from "~/components/Container.astro";
+import FormattedDate from "~/components/FormattedDate.astro";
+import Layout from "~/layouts/Layout.astro";
+
+const posts = (await getCollection("blog")).sort((a, b) => {
+  return a.data.datePublished < b.data.datePublished ? 1 : -1;
+});
+
+const latest = posts[0];
+
+const remaining = posts.filter((post) => post.slug !== latest.slug);
+---
+
+<Layout title="blog." description="my blog with all my posts.">
+  <Container class="mt-4 lg:mt-8">
+    <h1>my blog.</h1>
+    <p class="mt-4">feel free to filter by category to find something you actually might find interesting.</p>
+
+    <section>
+      <h2>latest.</h2>
+      <ul class="mt-4 p-0">
+        <li
+          class="mt-4 items-baseline text-zinc-400 flex flex-row gap-x-4 list-none px-0 py-2 border-y-zinc-50 border-y dark:border-y-zinc-800"
+        >
+          <FormattedDate class="text-sm" date={latest.data.datePublished} />
+          <a href={`/blog/${latest.slug}`}>{latest.data.title}</a>
+          <span></span>
+        </li>
+      </ul>
+      <h2>the rest.</h2>
+      <ul class="mt-4 p-0">
+        {
+          remaining.map((post) => {
+            return (
+              <li class="mt-4 items-baseline text-zinc-400 flex flex-row gap-x-4 list-none px-0 py-2 border-y-zinc-50 border-y dark:border-y-zinc-800">
+                <FormattedDate class="text-sm" date={post.data.datePublished} />
+                <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+                <span />
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+  </Container>
+</Layout>

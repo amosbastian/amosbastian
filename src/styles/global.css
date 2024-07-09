@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "InterVariable", "Inter";
+  }
+  .dark {
+  }
+}
+
+@layer base {
+  body {
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+}
+
+html,
+body,
+div#root {
+  height: 100%;
+}
+
+.prose h2 {
+  scroll-margin-top: 5rem;
+}
+
+.prose h3 {
+  scroll-margin-top: 4.5rem;
+}

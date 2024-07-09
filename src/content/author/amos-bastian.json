@@ -1,0 +1,10 @@
+{
+  "givenName": "Amos",
+  "familyName": "Bastian",
+  "additionalName": "Amos Luka Bastian",
+  "birthDate": "1994-01-01",
+  "birthPlace": {
+    "address": "Hillingdon Hospital, Pield Heath Rd, Uxbridge UB8 3NN, UK"
+  },
+  "image": "~/assets/author/amosbastian.png"
+}

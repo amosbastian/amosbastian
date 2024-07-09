@@ -1,0 +1,78 @@
+---
+import { SEO, type Props as AstroSEOProps } from "astro-seo";
+import defaultImage from "~/assets/example.png";
+import { SITE_DESCRIPTION, SITE_TITLE } from "~/consts";
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+
+type Props = AstroSEOProps;
+
+const props = Astro.props;
+
+const defaultImageURL = new URL(defaultImage.src, Astro.site);
+---
+
+<html lang="en" class="dark">
+  <head>
+    <SEO
+      title={props.title}
+      titleTemplate="%s"
+      titleDefault={SITE_TITLE}
+      description={props.description ?? SITE_DESCRIPTION}
+      openGraph={{
+        basic: {
+          title: props.title ?? SITE_TITLE,
+          type: "website",
+          image: defaultImageURL.href,
+          ...props.openGraph?.basic,
+        },
+        optional: {
+          locale: "en",
+          siteName: "amosbastian",
+          ...props.openGraph?.optional,
+        },
+        image: {
+          alt: "amosbastian",
+          height: 630,
+          width: 1200,
+          type: "image/webp",
+          url: defaultImageURL.href,
+          ...props.openGraph?.image,
+        },
+        ...props.openGraph,
+      }}
+      twitter={{
+        creator: "@amosbastian",
+        card: "summary_large_image",
+        ...props.twitter,
+      }}
+    />
+    <BaseHead />
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
+  </head>
+
+  <body class="bg-zinc-50 dark:bg-black">
+    <div class="fixed inset-0 flex justify-center sm:px-8">
+      <div class="flex w-full max-w-3xl lg:px-8">
+        <div class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"></div>
+      </div>
+    </div>
+    <div class="relative flex w-full flex-col">
+      <Header />
+      <main class="flex-auto min-h-dvh">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>
