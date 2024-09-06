@@ -17,6 +17,7 @@
     "@astrojs/tailwind": "^5.1.0",
     "@tailwindcss/typography": "^0.5.13",
     "astro": "^4.11.5",
+    "astro-expressive-code": "^0.36.1",
     "astro-seo": "^0.8.4",
     "astro-seo-schema": "^4.0.2",
     "schema-dts": "^1.1.2",

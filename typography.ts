@@ -75,26 +75,26 @@ export default function typographyStyles({ theme }: PluginUtils) {
           marginBottom: theme("spacing.10"),
         },
         p: {
-          marginTop: theme("spacing.7"),
-          marginBottom: theme("spacing.7"),
+          marginTop: theme("spacing.5"),
+          marginBottom: theme("spacing.5"),
         },
 
         // Headings
         "h1, h2, h3": {
           color: "var(--tw-prose-headings)",
-          fontWeight: theme("fontWeight.normal"),
+          fontWeight: theme("fontWeight.semibold"),
         },
         h2: {
           fontSize: theme("fontSize.base")[0],
           lineHeight: theme("lineHeight.7"),
-          marginTop: theme("spacing.20"),
-          marginBottom: theme("spacing.4"),
+          marginTop: theme("spacing.10"),
+          marginBottom: theme("spacing.2"),
         },
         h3: {
           fontSize: theme("fontSize.base")[0],
           lineHeight: theme("lineHeight.7"),
-          marginTop: theme("spacing.16"),
-          marginBottom: theme("spacing.4"),
+          marginTop: theme("spacing.10"),
+          marginBottom: theme("spacing.2"),
         },
         ":is(h2, h3) + *": {
           marginTop: 0,
@@ -129,7 +129,7 @@ export default function typographyStyles({ theme }: PluginUtils) {
           fontSize: theme("fontSize.sm")[0],
           fontWeight: theme("fontWeight.semibold"),
           backgroundColor: "var(--tw-prose-code-bg)",
-          borderRadius: theme("borderRadius.lg"),
+          borderRadius: theme("borderRadius.md"),
           paddingLeft: theme("spacing.1"),
           paddingRight: theme("spacing.1"),
         },
@@ -170,8 +170,8 @@ export default function typographyStyles({ theme }: PluginUtils) {
           paddingLeft: theme("spacing.6"),
         },
         li: {
-          marginTop: theme("spacing.6"),
-          marginBottom: theme("spacing.6"),
+          marginTop: theme("spacing.1"),
+          marginBottom: theme("spacing.1"),
           paddingLeft: theme("spacing[3.5]"),
         },
         "li::marker": {
@@ -185,12 +185,12 @@ export default function typographyStyles({ theme }: PluginUtils) {
           color: "var(--tw-prose-bullets)",
         },
         "li :is(ol, ul)": {
-          marginTop: theme("spacing.4"),
-          marginBottom: theme("spacing.4"),
+          marginTop: theme("spacing.1"),
+          marginBottom: theme("spacing.1"),
         },
         "li :is(li, p)": {
-          marginTop: theme("spacing.3"),
-          marginBottom: theme("spacing.3"),
+          marginTop: theme("spacing.1"),
+          marginBottom: theme("spacing.1"),
         },
 
         // Code blocks
@@ -199,8 +199,8 @@ export default function typographyStyles({ theme }: PluginUtils) {
           fontSize: theme("fontSize.sm")[0],
           fontWeight: theme("fontWeight.medium"),
           backgroundColor: "var(--tw-prose-pre-bg)",
-          borderRadius: theme("borderRadius.3xl"),
-          padding: theme("spacing.8"),
+          borderRadius: theme("borderRadius.md"),
+          padding: theme("spacing.4"),
           overflowX: "auto",
           border: "1px solid",
           borderColor: "var(--tw-prose-pre-border)",
