@@ -88,13 +88,13 @@ export default function typographyStyles({ theme }: PluginUtils) {
           fontSize: theme("fontSize.base")[0],
           lineHeight: theme("lineHeight.7"),
           marginTop: theme("spacing.10"),
-          marginBottom: theme("spacing.2"),
+          marginBottom: theme("spacing.4"),
         },
         h3: {
           fontSize: theme("fontSize.base")[0],
           lineHeight: theme("lineHeight.7"),
           marginTop: theme("spacing.10"),
-          marginBottom: theme("spacing.2"),
+          marginBottom: theme("spacing.4"),
         },
         ":is(h2, h3) + *": {
           marginTop: 0,
@@ -102,7 +102,9 @@ export default function typographyStyles({ theme }: PluginUtils) {
 
         // Images
         img: {
-          borderRadius: theme("borderRadius.3xl"),
+          borderRadius: theme("borderRadius.sm"),
+          marginBottom: theme("spacing.4"),
+          marginTop: theme("spacing.4"),
         },
 
         // Inline elements

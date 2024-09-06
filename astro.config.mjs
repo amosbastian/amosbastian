@@ -28,5 +28,4 @@ export default defineConfig({
     rehypePlugins: [rehypeSlug, ...rehypeAutolink()],
     drafts: true,
   },
-  trailingSlash: "never",
 });
