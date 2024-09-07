@@ -50,7 +50,7 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
     isPartOf: {
       "@type": "Blog",
       "@id": `/blog`,
-      name: "amos bastian's blog.",
+      name: "amos' blog.",
     },
     url: `/${slug}`,
   }}
@@ -63,7 +63,7 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
       {
         "@type": "ListItem",
         position: 1,
-        name: "amos bastian.",
+        name: "amos.",
         item: `/`,
       },
       {
@@ -82,7 +82,23 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
   }}
 />
 
-<Layout title={frontmatter.metaTitle} description={frontmatter.metaDescription}>
+<Layout
+  title={frontmatter.metaTitle}
+  description={frontmatter.metaDescription}
+  openGraph={{
+    article: {
+      authors: authors.map((author) => `${author.data.givenName} ${author.data.familyName}`),
+      publishedTime: new Date(frontmatter.datePublished).toISOString(),
+      modifiedTime: frontmatter.dateModified ? new Date(frontmatter.dateModified).toISOString() : undefined,
+      section: frontmatter.tags ? frontmatter.tags[0] : undefined,
+    },
+    basic: {
+      title: frontmatter.metaTitle ?? frontmatter.title,
+      type: "article",
+      image: frontmatter.coverImage.src,
+    },
+  }}
+>
   <Container>
     <div class="flex flex-row justify-between items-center">
       <h1>{frontmatter.title}</h1>
