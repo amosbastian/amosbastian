@@ -1,5 +1,6 @@
 ---
-datePublished: 2024-09-06
+datePublished: 2024-09-06T22:23:54.226Z
+dateModified: 2024-09-07T13:29:58.774Z
 authors:
   - amos-bastian
 metaTitle: self-hosting with sst on a $5 vps
@@ -87,7 +88,22 @@ or install it globally
 curl -fsSL https://sst.dev/install | bash
 ```
 
-Note: SST currently only supports macOS, Linux, and WSL. Support for Windows should be coming soon.
+<div
+  class="not-prose mt-4 flex items-center rounded-lg bg-blue-50 p-4 text-sm text-blue-800 dark:bg-gray-800 dark:text-blue-400"
+  role="alert"
+>
+  <svg
+    class="me-3 inline h-4 w-4 flex-shrink-0"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+  </svg>
+  <span class="sr-only">Information</span>
+  <div>SST currently only supports macOS, Linux, and WSL. Support for Windows should be coming soon.</div>
+</div>
 
 ## Set up the project
 
@@ -469,7 +485,7 @@ SSH into your server and run `docker ps`. Copy the id of the Plunk container and
   <Image src={confirmSnsSubscription} alt="Confirm SNS subscription on AWS" />
 </a>
 
-Then, head over to the SNS console, navigate to the subscription and click on "Request confirmation". AWS will send a mock HTTP POST request to your Plunk endpoint and Plunk will recognise that you want to confirm the subscription and show you the URL to confirm it. Copy and paste it into your browser and you're done!
+Then, head over to the SNS console (click "Start with an overview" if it prompts you to create a topic), navigate to the subscription and click on "Request confirmation". AWS will send a mock HTTP POST request to your Plunk endpoint and Plunk will recognise that you want to confirm the subscription and show you the URL to confirm it. Copy and paste it into your browser and you're done!
 
 ## Conclusion
 
