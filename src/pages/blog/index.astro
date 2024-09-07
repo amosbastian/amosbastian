@@ -29,7 +29,7 @@ const remaining = posts.filter((post) => post.slug !== latest.slug);
           <span></span>
         </li>
       </ul>
-      <h2>the rest.</h2>
+      {remaining.length > 0 ? <h2>the rest.</h2> : null}
       <ul class="mt-4 p-0">
         {
           remaining.map((post) => {

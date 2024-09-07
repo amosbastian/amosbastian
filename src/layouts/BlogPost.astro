@@ -84,6 +84,18 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
 
 <Layout title={frontmatter.metaTitle} description={frontmatter.metaDescription}>
   <Container>
+    <div class="flex flex-row justify-between items-center">
+      <h1>{frontmatter.title}</h1>
+      <time class="text-xs" datetime={new Date(frontmatter.datePublished).toISOString()}>
+        {
+          new Date(frontmatter.datePublished).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+        }{frontmatter.dateModified ? "*" : ""}</time
+      >
+    </div>
     <slot />
   </Container>
 </Layout>
