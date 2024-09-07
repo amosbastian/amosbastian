@@ -20,15 +20,15 @@ import plunk from "~/assets/self-hosting-with-sst-on-a-$5-vps/plunk.png";
 import confirmSnsSubscription from "~/assets/self-hosting-with-sst-on-a-$5-vps/confirm-sns-subscription.png";
 import cloudflareEmailAccountId from "~/assets/self-hosting-with-sst-on-a-$5-vps/cloudflare-email-account-id.png";
 
-I've been using [SST](https://sst.dev/) to deploy some of my projects to AWS for the past year. Some of these actually had more than 0 users. This + me being shit at coding + AWS = 💸.
+I've been using [SST](https://sst.dev/) to deploy some of my projects to AWS for the past year. Some of these actually had more than 0 users. This + my shit code + AWS = 💸.
 
-Safe to say I was waking up in the middle of the night drenched in sweat worrying about my AWS bill (or not really since they gave me $1000s of credits, but still). I realise I sound like a $5 VPS guy on 𝕏. Luckily for me, SST recently released an update that allows me to actually become a $5 VPS guy.
+Safe to say I was waking up in the middle of the night drenched in sweat worrying about my AWS bill (or not really since they gave me $1000s of credits, but still). I realise I sound like a $5 VPS guy. Luckily for me, SST recently released an update that allows me to actually join the $5 VPS guy cult.
 
 <div class="flex items-center justify-center">
   <Tweet id="1818060092698210497" />
 </div>
 
-I'm going to show you how to use SST to self-host [Plunk](https://useplunk.com) with SST on Hetzner Cloud, all with a custom domain, https, and more. Even if you're not interested in self-hosting Plunk, I think this guide can still be useful to help you figure out how to self-host other stuff with SST.
+I'm going to show you how to use SST to self-host [Plunk](https://useplunk.com) with SST on [Hetzner Cloud](https://www.hetzner.com/cloud/), all with a custom domain, HTTPs, and more. Even if you're not interested in self-hosting Plunk, I think this guide can still be useful to help you figure out how to self-host other stuff with SST.
 
 ## Set up AWS
 
@@ -40,7 +40,7 @@ Worst things first, we have to set up AWS. Thankfully SST has [a guide on how to
   <Image src={hetznerApiToken} alt="Create an API token on Hetzner" />
 </a>
 
-I'm using Hetzner, but if you want to use Digital Ocean, or any of the other platforms out there, go ahead. For Hetzner all you'll need to do is sign up, create a project, head to the security section, and create an API token. Put this token in your `.env` file:
+I'm using Hetzner, but if you want to use Digital Ocean, or any of the other platforms out there, go ahead. I'm sure there's a Pulumi provider out there and SST is just a Pulumi wrapper after all. For Hetzner all you'll need to do is sign up, create a project, head to the security section, and create an API token. Put this token in your `.env` file:
 
 ```
 # .env
@@ -53,7 +53,7 @@ HCLOUD_TOKEN="your-token"
   <Image src={cloudflareApiToken} alt="Create an API token on Cloudflare" />
 </a>
 
-We're going to use Cloudflare for our DNS. If you don't have an account yet, go ahead and create one. Once you have an account, add your domain to Cloudflare and change your nameservers to the ones Cloudflare provides. Then create an API token by heading to your profile, API tokens and clicking "Create token". You can use the "Edit zone DNS" template. Once you're done, copy the key and put it in your `.env` file:
+We're going to use Cloudflare for our DNS. If you don't have an account yet, go ahead and create one. Once you have an account, add your domain to Cloudflare and change your nameservers to the ones Cloudflare provides. Then create an API token by heading to your profile, then API tokens and clicking "Create token". You can use the "Edit zone DNS" template. Once you're done, copy the key and put it in your `.env` file:
 
 ```
 # .env
@@ -125,8 +125,6 @@ export default $config({
 });
 ```
 
-You should change `production` and `development` to the names of your AWS profiles. You can also change the `region` to your preferred region.
-
 First, let's set up our server. Run `sst add hcloud` and `sst add tls` and add the following code to your `run` function:
 
 ```typescript
@@ -176,7 +174,27 @@ According to [Plunk's self-hosting guide](https://docs.useplunk.com/getting-star
 - Plunk itself
 - A subscription to SNS
 
-Would you be surprised if I told you that you can do all of this with SST? I hope not, because you can. Run `sst add aws`, `sst add docker`, `sst add random` and add the following code to your `run` function:
+Would you be surprised if I told you that you can do all of this with SST? I hope not, because you can. Run `sst add aws`, `sst add docker`, `sst add random`. Update your `app` function to be something like
+
+```typescript
+# sst.config.ts
+app(input) {
+  return {
+    // ... other stuff
+    providers: {
+      // ... other providers
+      aws: {
+        region: "eu-central-1",
+        profile: input.stage === "production" ? "production" : "development",
+      },
+    },
+  };
+}
+```
+
+You should change `production` and `development` to the names of your AWS profiles. You can also change the `region` to your preferred region.
+
+Then, add the following code to your `run` function:
 
 ```typescript
 # sst.config.ts
@@ -375,7 +393,7 @@ const snsSubscription = new aws.sns.TopicSubscription(
 );
 ```
 
-This will set up everything you need to self-host Plunk. Run `sst deploy` and you can view your self-hosted Plunk by visiting `http://your.server.ip:3000`.
+This will set up everything you need to self-host Plunk. Run `sst deploy` and you should be able to view your self-hosted Plunk by visiting `http://your.server.ip:3000`.
 
 <a href={plunk.src} target="_blank">
   <Image src={plunk} alt="Plunk's login screen" />
@@ -383,7 +401,7 @@ This will set up everything you need to self-host Plunk. Run `sst deploy` and yo
 
 ## Adding a custom domain
 
-Obviously you don't want to use your server's IP address to access Plunk over http. With SST we can also set up Cloudflare to point a custom domain to our server and Caddy (or any other reverse proxy) to handle https. Run `sst add cloudflare` and add the following code to your `run` function:
+Obviously you don't want to use your server's IP address to access Plunk over HTTP. With SST we can also set up Cloudflare to point a custom domain to our server and Caddy (or any other reverse proxy) to handle HTTPs. Run `sst add cloudflare` and `sst add command` and add the following code to your `run` function:
 
 ```typescript
 # sst.config.ts
@@ -490,5 +508,7 @@ Then, head over to the SNS console (click "Start with an overview" if it prompts
 ## Conclusion
 
 And that's it! You've now self-hosted Plunk with SST on a $5 VPS. You can now access Plunk by visiting `https://plunk.example.com`.
+
+There are probably loads of things you can do to improve this setup, but I hope this guide has given you a good starting point.
 
 If you have any questions, feel free to [ask me on 𝕏](https://x.com/amosbastian). I'll also definitely be writing more about my experience with $5 VPSs and SST in the future (hardening your server, zero downtime deployments, etc.), so give me a follow if you're interested in that.
