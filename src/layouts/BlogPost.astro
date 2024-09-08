@@ -97,7 +97,15 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
       type: "article",
       image: frontmatter.coverImage.src,
     },
+    image: {
+      alt: frontmatter.title,
+      height: frontmatter.coverImage.height,
+      width: frontmatter.coverImage.width,
+      type: `image/${frontmatter.coverImage.format}`,
+      url: frontmatter.coverImage.src,
+    },
   }}
+  }
 >
   <Container>
     <div class="flex flex-row justify-between items-center">

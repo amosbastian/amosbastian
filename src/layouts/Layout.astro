@@ -34,9 +34,9 @@ const defaultImageURL = new URL(defaultImage.src, Astro.site);
         },
         image: {
           alt: "amosbastian",
-          height: 630,
-          width: 1200,
-          type: "image/webp",
+          height: defaultImage.height,
+          width: defaultImage.width,
+          type: `image/${defaultImage.format}`,
           url: defaultImageURL.href,
           ...props.openGraph?.image,
         },
