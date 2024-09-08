@@ -9,8 +9,6 @@ import Header from "../components/Header.astro";
 type Props = AstroSEOProps;
 
 const props = Astro.props;
-
-const defaultImageURL = new URL(defaultImage.src, Astro.site);
 ---
 
 <html lang="en" class="dark">
@@ -24,7 +22,7 @@ const defaultImageURL = new URL(defaultImage.src, Astro.site);
         basic: {
           title: props.title ?? SITE_TITLE,
           type: "website",
-          image: defaultImageURL.href,
+          image: "/og-image.jpg",
           ...props.openGraph?.basic,
         },
         optional: {
@@ -37,7 +35,7 @@ const defaultImageURL = new URL(defaultImage.src, Astro.site);
           height: defaultImage.height,
           width: defaultImage.width,
           type: `image/${defaultImage.format}`,
-          url: defaultImageURL.href,
+          url: "/og-image.jpg",
           ...props.openGraph?.image,
         },
         ...props.openGraph,

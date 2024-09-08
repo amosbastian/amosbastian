@@ -25,7 +25,7 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
     image: frontmatter.coverImage
       ? {
           "@type": "ImageObject",
-          url: frontmatter.coverImage.src,
+          url: `/${slug}/og-image.jpg`,
           width: `${frontmatter.coverImage.width}`,
           height: `${frontmatter.coverImage.height}`,
         }
@@ -95,14 +95,14 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
     basic: {
       title: frontmatter.metaTitle ?? frontmatter.title,
       type: "article",
-      image: frontmatter.coverImage.src,
+      image: `/${slug}/og-image.jpg`,
     },
     image: {
       alt: frontmatter.title,
       height: frontmatter.coverImage.height,
       width: frontmatter.coverImage.width,
       type: `image/${frontmatter.coverImage.format}`,
-      url: frontmatter.coverImage.src,
+      url: `/${slug}/og-image.jpg`,
     },
   }}
   }
