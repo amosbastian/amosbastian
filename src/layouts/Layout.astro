@@ -22,7 +22,7 @@ const props = Astro.props;
         basic: {
           title: props.title ?? SITE_TITLE,
           type: "website",
-          image: "/og-image.jpg",
+          image: defaultImage.src,
           ...props.openGraph?.basic,
         },
         optional: {
@@ -35,7 +35,7 @@ const props = Astro.props;
           height: defaultImage.height,
           width: defaultImage.width,
           type: `image/${defaultImage.format}`,
-          url: "/og-image.jpg",
+          url: defaultImage.src,
           ...props.openGraph?.image,
         },
         ...props.openGraph,
