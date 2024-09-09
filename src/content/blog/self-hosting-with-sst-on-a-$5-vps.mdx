@@ -202,6 +202,12 @@ const plunkSnsTopic = new aws.sns.Topic("PlunkSNSTopic", {
   name: "plunk",
 });
 
+// A configuration set
+const plunkConfigurationSet = new aws.ses.ConfigurationSet("PlunkConfigurationSet", {
+  name: "plunk-configuration-set",
+});
+
+
 const eventDestination = new aws.ses.EventDestination("SESEventDestination", {
   configurationSetName: plunkConfigurationSet.name,
   enabled: true,
@@ -209,11 +215,6 @@ const eventDestination = new aws.ses.EventDestination("SESEventDestination", {
   snsDestination: {
     topicArn: plunkSnsTopic.arn,
   },
-});
-
-// A configuration set
-const plunkConfigurationSet = new aws.ses.ConfigurationSet("PlunkConfigurationSet", {
-  name: "plunk-configuration-set",
 });
 
 // AWS credentials
@@ -269,7 +270,7 @@ const dockerProvider = new docker.Provider(
 const network = new docker.Network(
   "DockerNetwork",
   {
-    name: "contentbase",
+    name: "network",
   },
   {
     provider: dockerProvider,
@@ -289,7 +290,7 @@ const postgres = new docker.Container(
   "PostgresContainer",
   {
     name: "db",
-    image: "postgres:14",
+    image: "postgres",
     envs: [
       $interpolate`POSTGRES_PASSWORD=${dbPassword.result}`,
       $interpolate`POSTGRES_DB=${dbName}`,
