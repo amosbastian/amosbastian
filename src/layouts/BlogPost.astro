@@ -64,19 +64,19 @@ const authors = await Promise.all(post.data.authors.map((author) => getEntry(aut
         "@type": "ListItem",
         position: 1,
         name: "amos.",
-        item: `/`,
+        item: `https://amosbastian.com/`,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "blog.",
-        item: `/blog`,
+        item: `https://amosbastian.com/blog/`,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: frontmatter.title,
-        item: `/blog/${slug}`,
+        item: `https://amosbastian.com/blog/${slug}/`,
       },
     ],
   }}
