@@ -1,5 +1,6 @@
 ---
 datePublished: 2024-09-07T13:29:58.774Z
+dateModified: 2024-09-11T18:24:50.609Z
 authors:
   - amos-bastian
 metaTitle: self-hosting with sst on a $5 vps
@@ -27,7 +28,7 @@ Safe to say I was waking up in the middle of the night drenched in sweat worryin
   <Tweet id="1818060092698210497" />
 </div>
 
-I'm going to show you how to use SST to self-host [Plunk](https://useplunk.com) with SST on [Hetzner Cloud](https://www.hetzner.com/cloud/), all with a custom domain, HTTPs, and more. Even if you're not interested in self-hosting Plunk, I think this guide can still be useful to help you figure out how to self-host other stuff with SST.
+I'm going to show you how to use SST to self-host [Plunk](https://useplunk.com) with SST on [Hetzner Cloud](https://www.hetzner.com/cloud/), all with a custom domain, HTTPS, and more. Even if you're not interested in self-hosting Plunk, I think this guide can still be useful to help you figure out how to self-host other stuff with SST.
 
 ## Set up AWS
 
@@ -338,10 +339,6 @@ const jwtSecret = new random.RandomPassword("JwtSecret", {
   special: true,
 });
 
-const plunkSnsTopic = new aws.sns.Topic("SESTopic", {
-  name: "ses-topic",
-});
-
 const plunkDomain = $interpolate`http://${server.ipv4Address}`;
 
 const plunk = new docker.Container(
@@ -401,7 +398,7 @@ This will set up everything you need to self-host Plunk. Run `sst deploy` and yo
 
 ## Adding a custom domain
 
-Obviously you don't want to use your server's IP address to access Plunk over HTTP. With SST we can also set up Cloudflare to point a custom domain to our server and Caddy (or any other reverse proxy) to handle HTTPs. Run `sst add cloudflare` and `sst add command` and add the following code to your `run` function:
+Obviously you don't want to use your server's IP address to access Plunk over HTTP. With SST we can also set up Cloudflare to point a custom domain to our server and Caddy (or any other reverse proxy) to handle HTTPS. Run `sst add cloudflare` and `sst add command` and add the following code to your `run` function:
 
 ```typescript
 # sst.config.ts
@@ -431,7 +428,7 @@ new cloudflare.Record(
 );
 
 // const plunkDomain = $interpolate`http://${server.ipv4Address}`;
-const plunkDomain = `plunk.${domain}`;
+const plunkDomain = `https://plunk.${domain}`;
 
 // Set up Caddy
 const defaultCaddyFile = `{
@@ -488,6 +485,20 @@ const caddyContainer = new docker.Container(
     restart: "always",
   },
   { provider: dockerProvider, dependsOn: [server, remoteCaddyfile, plunk] },
+);
+
+// Update this to HTTPS as well:
+const snsSubscription = new aws.sns.TopicSubscription(
+  "SNSSubscription",
+  {
+    topic: plunkSnsTopic.arn,
+    protocol: "https", // ⬅️ Change this to https
+    endpoint: `${plunkDomain}/api/webhooks/incoming/sns`,
+    endpointAutoConfirms: false,
+  },
+  {
+    dependsOn: [plunk, plunkSnsTopic],
+  },
 );
 ```
 
