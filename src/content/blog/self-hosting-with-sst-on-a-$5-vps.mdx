@@ -1,6 +1,6 @@
 ---
 datePublished: 2024-09-07T13:29:58.774Z
-dateModified: 2024-09-11T18:24:50.609Z
+dateModified: 2024-10-08T18:05:28.043Z
 authors:
   - amos-bastian
 metaTitle: self-hosting with sst on a $5 vps
@@ -22,7 +22,7 @@ import cloudflareEmailAccountId from "~/assets/self-hosting-with-sst-on-a-$5-vps
 
 I've been using [SST](https://sst.dev/) to deploy some of my projects to AWS for the past year. Some of these actually had more than 0 users. This + my shit code + AWS = 💸.
 
-Safe to say I was waking up in the middle of the night drenched in sweat worrying about my AWS bill (or not really since they gave me $1000s of credits, but still). I realise I sound like a $5 VPS guy. Luckily for me, SST recently released an update that allows me to actually join the $5 VPS guy cult.
+Safe to say I was waking up in the middle of the night drenched in sweat worrying about my AWS bill (or not really since they gave me $1000s of credits, but still). Luckily for me, SST recently released an update that allows me to become a $5 VPS guy.
 
 <div class="flex items-center justify-center">
   <Tweet id="1818060092698210497" />
@@ -257,6 +257,27 @@ const keyPath = privateKey.privateKeyOpenssh.apply((key) => {
   return resolve(path);
 });
 
+// Wait until Docker is ready on the server
+const dockerServiceReady = new command.remote.Command(
+    `${name}DockerServiceReady`,
+    {
+      connection: {
+        host: server.ipv4Address,
+        user: "root",
+        privateKey: privateKey.privateKeyOpenssh,
+      },
+      create: $interpolate`
+until systemctl is-active --quiet docker; do
+  echo "Waiting for Docker to start..."
+  sleep 5
+done`,
+    },
+    {
+      dependsOn: [server],
+    },
+  );
+
+
 const dockerProvider = new docker.Provider(
   "DockerProvider",
   {
@@ -264,7 +285,7 @@ const dockerProvider = new docker.Provider(
     sshOpts: ["-i", keyPath, "-o", "StrictHostKeyChecking=no"],
   },
   {
-    dependsOn: [server],
+    dependsOn: [dockerServiceReady],
   },
 );
 
@@ -275,7 +296,7 @@ const network = new docker.Network(
   },
   {
     provider: dockerProvider,
-    dependsOn: [server],
+    dependsOn: [dockerProvider],
   },
 );
 
