@@ -6,15 +6,11 @@
   :root {
     --font-sans: "InterVariable", "Inter";
   }
-  .dark {
-  }
 }
 
 @layer base {
   body {
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 

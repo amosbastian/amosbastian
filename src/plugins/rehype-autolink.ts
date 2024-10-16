@@ -1,7 +1,7 @@
 import type { RehypePlugins } from "astro";
-import { toString } from "hast-util-to-string";
+import * as hastUtilToString from "hast-util-to-string";
 import { h } from "hastscript";
-import { escape } from "html-escaper";
+import * as htmlEscaper from "html-escaper";
 import rehypeAutolinkHeadings, { type Options as AutolinkOptions } from "rehype-autolink-headings";
 
 const AnchorLinkIcon = h(
@@ -21,7 +21,7 @@ const AnchorLinkIcon = h(
 );
 
 const createSROnlyLabel = (text: string) => {
-  return h("span", { "is:raw": true, class: "sr-only" }, `Section titled: ${escape(text)}`);
+  return h("span", { "is:raw": true, class: "sr-only" }, `Section titled: ${htmlEscaper.escape(text)}`);
 };
 
 /**
@@ -38,7 +38,7 @@ const autolinkConfig: AutolinkOptions = {
       tabIndex: -1,
       class: `group flex flex-row items-baseline gap-x-2 level-${tagName}`,
     }),
-  content: (heading) => [AnchorLinkIcon, createSROnlyLabel(toString(heading))],
+  content: (heading) => [AnchorLinkIcon, createSROnlyLabel(hastUtilToString.toString(heading))],
 };
 
 /**
