@@ -1,0 +1,250 @@
+---
+datePublished: 2024-10-23T15:05:13.730Z
+authors:
+  - amos-bastian
+metaTitle: hardening a $5 hetzner vps with sst and ansible
+metaDescription: learn how to harden your $5 vps with sst and ansible so bad actors can't abuse your server.
+title: hardening a $5 hetzner vps with sst and ansible.
+description: learn how to harden your $5 vps with sst and ansible so bad actors can't abuse your server.
+coverImage: "~/assets/hardening-a-$5-vps-with-sst-and-ansible/og-image.png"
+tags: ["self-hosting"]
+---
+
+I've been going down the $5 VPS rabbit hole for a while now, and have been [using SST to deploy my applications to Hetzner](/self-hosting-with-sst-on-a-$5-vps). But being a recovering serverless addict, the concept of "hardening" your server was foreign to me, so my servers were just sitting ducks for bad actors. For all the idiots like myself out there, hardening is essentially securing a system by minimising its vulnerabilities — this involves disabling unnecessary services, removing unused software, and configuring the system to be as secure as possible.
+
+With security being such a hot topic on X right now, I thought this would be a good time to share how I'm using SST and Ansible to automate the process of hardening my servers.
+
+## The firewall
+
+First things first, we need to set up a firewall. Most people will set this up using `ufw` (Uncomplicated Firewall) but since I'm using Hetzner and SST, we can easily do this with some code like so:
+
+```typescript
+const firewall = new hcloud.Firewall("Firewall", {
+  name: "firewall",
+  rules: [
+    {
+      direction: "in",
+      protocol: "tcp",
+      port: "22",
+      sourceIps: ["0.0.0.0/0", "::/0"],
+      description: "Allow SSH",
+    },
+    {
+      direction: "in",
+      protocol: "tcp",
+      port: "80",
+      sourceIps: ["0.0.0.0/0", "::/0"],
+      description: "Allow HTTP",
+    },
+    {
+      direction: "in",
+      protocol: "tcp",
+      port: "443",
+      sourceIps: ["0.0.0.0/0", "::/0"],
+      description: "Allow HTTPS",
+    },
+    {
+      direction: "out",
+      protocol: "tcp",
+      port: "1-65535",
+      destinationIps: ["0.0.0.0/0", "::/0"],
+      description: "Allow all outgoing TCP traffic",
+    },
+    {
+      direction: "out",
+      protocol: "udp",
+      port: "1-65535",
+      destinationIps: ["0.0.0.0/0", "::/0"],
+      description: "Allow all outgoing UDP traffic",
+    },
+  ],
+});
+
+const server = new hcloud.Server("Server", {
+  name: "server",
+  image: "debian-12",
+  serverType: "cpx11",
+  location: "ash",
+  sshKeys: [publicKey.id],
+  firewallIds: [firewall.id],
+});
+```
+
+This code sets up a firewall that allows SSH, HTTP, and HTTPS traffic, and allows all outgoing TCP and UDP traffic. This is a good starting point, but you should adjust the rules to suit your needs.
+
+## Creating a new user
+
+Now we've set up our fireall, we can log into our server and create a new user. This is important because the default `root` user has full access to the server, which makes it a prime target for bad actors. By creating a new user with limited privileges, you can reduce the risk of a successful attack.
+
+```typescript
+// Install packages we will need later
+const installation = new command.remote.Command("Installation", {
+  connection: {
+    host: server.ipv4Address,
+    user: "root",
+    privateKey: privateKey.privateKeyOpenssh,
+  },
+  create: `#!/bin/bash
+set -ex
+
+# Update and install basic packages
+apt-get update
+apt-get install -y fail2ban sudo ansible`,
+});
+
+// Create a new user
+const user = "amos";
+const createUser = new command.remote.Command(
+  "CreateUser",
+  {
+    connection: {
+      host: server.ipv4Address,
+      user: "root",
+      privateKey: privateKey.privateKeyOpenssh,
+    },
+    create: $interpolate`#!/bin/bash
+set -e
+set -o pipefail
+
+# Create a new user
+NEW_USER="${user}"
+useradd -m -s /bin/bash "$NEW_USER"
+sudo usermod -aG sudo $NEW_USER
+echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/$NEW_USER"
+
+# Set up SSH for the new user
+mkdir -p "/home/$NEW_USER/.ssh"
+sudo cp /root/.ssh/authorized_keys /home/$NEW_USER/.ssh/
+chmod 700 "/home/$NEW_USER/.ssh"
+chmod 600 "/home/$NEW_USER/.ssh/authorized_keys"
+chown -R "$NEW_USER:$NEW_USER" "/home/$NEW_USER/.ssh"`,
+  },
+  {
+    dependsOn: [installation],
+  },
+);
+```
+
+This code creates a new user called `amos` and gives them sudo privileges. It also copies the `authorized_keys` file from the `root` user to the new user's `.ssh` directory, so you can log in with your SSH key.
+
+## The hardening
+
+Now that we have set up our fireall and created a new user, we need to harden the server. This is where Ansible comes in. Ansible is an open-source automation tool that allows you to automate the configuration of servers. We can use Ansible to automate the process of hardening our server by creating a playbook that does everything for us.
+
+Of course we aren't going to create one ourselves, because there's already a great collection out there called [devsec.hardening](https://github.com/dev-sec/ansible-collection-hardening). We'll be using the ones for hardening SSH and the operating system.
+
+```typescript
+const hardeningPlaybook = `
+---
+- hosts: localhost
+connection: local
+become: yes
+collections:
+  - devsec.hardening
+vars:
+  ssh_allow_users: "${newUser}"
+  ssh_allow_groups: "${newUser}"
+roles:
+  - devsec.hardening.os_hardening
+  - devsec.hardening.ssh_hardening
+tasks:
+  - name: Ensure SSH service is enabled and running
+    systemd:
+      name: ssh
+      state: started
+      enabled: yes
+  - name: Reload SSH service
+    systemd:
+      name: ssh
+      state: reloaded`;
+
+new command.remote.Command(
+  "HardenServer",
+  {
+    connection: {
+      host: server.ipv4Address,
+      user: "root",
+      privateKey: privateKey.privateKeyOpenssh,
+    },
+    create: $interpolate`#!/bin/bash
+set -e
+set -o pipefail
+
+# Install DevSec hardening collection
+ansible-galaxy collection install devsec.hardening
+
+# Create Ansible playbook
+cat << 'EOYAML' > /root/hardening_playbook.yml
+${hardeningPlaybook}
+EOYAML
+
+# Run Ansible playbook
+ansible-playbook /root/hardening_playbook.yml
+
+# Update system
+apt-get update && apt-get upgrade -y`,
+  },
+  {
+    dependsOn: [createUser],
+  },
+);
+```
+
+This code installs the `devsec.hardening` collection, creates an Ansible playbook that hardens the server, and then runs the playbook. The playbook hardens the operating system and SSH service, and ensures that the SSH service is enabled and running.
+
+## Fail2Ban (Optional)
+
+Finally, we can set up Fail2Ban to protect our server from brute-force attacks. Fail2Ban is an open-source intrusion prevention tool that scans log files for malicious activity and bans IP addresses that show signs of malicious activity.
+
+To do this, we can update the playbook to the following:
+
+```typescript
+const hardeningPlaybook = `
+---
+- hosts: localhost
+connection: local
+become: yes
+collections:
+  - devsec.hardening
+vars:
+  ssh_allow_users: "${newUser}"
+  ssh_allow_groups: "${newUser}"
+  fail2ban_jail_local: |
+    [sshd]
+    port = {{ ssh_server_ports | first | default('22') }}
+    logpath = /var/log/auth.log
+    maxretry = 3
+    bantime = 3600
+roles:
+  - devsec.hardening.os_hardening
+  - devsec.hardening.ssh_hardening
+tasks:
+  - name: Ensure SSH service is enabled and running
+    systemd:
+      name: ssh
+      state: started
+      enabled: yes
+  - name: Reload SSH service
+    systemd:
+      name: ssh
+      state: reloaded
+  - name: Configure Fail2Ban for SSH
+    copy:
+      dest: /etc/fail2ban/jail.local
+      content: "{{ fail2ban_jail_local }}"
+    notify:
+      - Restart Fail2Ban
+handlers:
+  - name: Restart Fail2Ban
+    systemd:
+      name: fail2ban
+      state: restarted`;
+```
+
+This sets up Fail2Ban to monitor the SSH service and ban IP addresses that show signs of malicious activity. The `maxretry` parameter specifies the number of failed login attempts before an IP address is banned, and the `bantime` parameter specifies the duration of the ban in seconds.
+
+## Conclusion
+
+And that's it! We've set up a firewall, created a new user, hardened the server, and set up Fail2Ban to protect our server from bad actors. 
+
+There are probably loads more things you can do (such as changing the default SSH port, for example), but I think this is a good starting point, that is totally automated. If you know of any other good practices that I missed, please let me know [on 𝕏](https://x.com/amosbastian). I'll also definitely be writing more about my experience with $5 VPSs in the future, so while you're there, consider giving me a follow.

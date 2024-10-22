@@ -1,5 +1,10 @@
 /** @type {import("prettier").Config} */
 export default {
+  semi: true,
+  singleQuote: false,
+  trailingComma: "all",
+  arrowParens: "always",
+  printWidth: 120,
   plugins: ["prettier-plugin-tailwindcss", "prettier-plugin-astro"],
   overrides: [
     {
@@ -9,9 +14,5 @@ export default {
       },
     },
   ],
-  semi: true,
-  trailingComma: "all",
-  singleQuote: false,
-  printWidth: 120,
   tailwindConfig: "./tailwind.config.mjs",
 };
