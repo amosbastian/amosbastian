@@ -4,7 +4,7 @@ dateModified: 2024-10-08T18:05:28.043Z
 authors:
   - amos-bastian
 metaTitle: self-hosting with sst on a $5 vps
-metaDescription: learn how to self-host plunk with sst on hetzner cloud, all with a custom domain, https, and more.
+metaDescription: learn how to self-host plunk with sst on hetzner cloud (or any other provider such as digitalocean, linode, vultr etc.), all with a custom domain, https, and more.
 title: self-hosting with sst on a $5 vps.
 description: learn how to self-host plunk with sst on hetzner cloud, all with a custom domain, https, and more.
 coverImage: "~/assets/self-hosting-with-sst-on-a-$5-vps/og-image.png"
@@ -441,7 +441,7 @@ new cloudflare.Record(
     name: "plunk." + domain.replace(/\.example\.com$/, ""),
     type: "A",
     value: server.ipv4Address,
-    proxied: false,
+    proxied: true,
   },
   {
     dependsOn: [server],

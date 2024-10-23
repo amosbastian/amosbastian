@@ -3,14 +3,14 @@ datePublished: 2024-10-23T15:05:13.730Z
 authors:
   - amos-bastian
 metaTitle: hardening a $5 hetzner vps with sst and ansible
-metaDescription: learn how to harden your $5 vps with sst and ansible so bad actors can't abuse your server.
+metaDescription: learn how to harden your $5 vps on hetzner (or any other provider such as digitalocean, linode, vultr etc.) with sst and ansible so bad actors can't abuse your server.
 title: hardening a $5 hetzner vps with sst and ansible.
 description: learn how to harden your $5 vps with sst and ansible so bad actors can't abuse your server.
 coverImage: "~/assets/hardening-a-$5-vps-with-sst-and-ansible/og-image.png"
 tags: ["self-hosting"]
 ---
 
-I've been going down the $5 VPS rabbit hole for a while now, and have been [using SST to deploy my applications to Hetzner](/self-hosting-with-sst-on-a-$5-vps). But being a recovering serverless addict, the concept of "hardening" your server was foreign to me, so my servers were just sitting ducks for bad actors. For all the idiots like myself out there, hardening is essentially securing a system by minimising its vulnerabilities — this involves disabling unnecessary services, removing unused software, and configuring the system to be as secure as possible.
+I've been going down the $5 VPS rabbit hole for a while now, and have been [using SST to deploy my applications to Hetzner](/blog/self-hosting-with-sst-on-a-5-vps/). But being a recovering serverless addict, the concept of "hardening" your server was foreign to me, so my servers were just sitting ducks for bad actors. For all the idiots like myself out there, hardening is essentially securing a system by minimising its vulnerabilities — this involves disabling unnecessary services, removing unused software, and configuring the system to be as secure as possible.
 
 With security being such a hot topic on X right now, I thought this would be a good time to share how I'm using SST and Ansible to automate the process of hardening my servers.
 
